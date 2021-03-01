@@ -26,5 +26,5 @@ Follow [these instructions](https://github.com/Optimal-Control-16-745/JuliaIntro
 We may release changes to the homework periodically if errors or bugs are found. Follow these instructions for linking your repo to the original template and pulling changes. It's always a good idea to branch your code before pulling from the upstream repo in case something goes wrong or the merge is particularly nasty. Do the right away after creating your repo. 
 ```
 git remote add upstream https://github.com/Optimal-Control-16-745/hw2
-git pull upstream master --allow-unrelated-histories
+git pull upstream main --allow-unrelated-histories
 ```
