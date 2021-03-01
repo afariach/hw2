@@ -22,6 +22,8 @@ Make sure your repo lives under the Class Organization. This will be done automa
 
 Follow [these instructions](https://github.com/Optimal-Control-16-745/JuliaIntro/blob/main/docs/Submission%20Instructions.md) for submitting your final time-stamped submission.
 
+Remember to replace the name and andrew ID in the HW#.jl file with your own! 
+
 ## Adding the Upstream Repo
 We may release changes to the homework periodically if errors or bugs are found. Follow these instructions for linking your repo to the original template and pulling changes. It's always a good idea to branch your code before pulling from the upstream repo in case something goes wrong or the merge is particularly nasty. Do the right away after creating your repo. 
 ```
