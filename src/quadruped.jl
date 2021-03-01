@@ -237,6 +237,20 @@ function RobotDynamics.dynamics(model::UnitreeA1, x::AbstractVector{T1}, u::Abst
     return [q̇; v̇]
 end
 
+"""
+    jacobian(model, x, u)
+
+Evaluate the discrete continuous Jacobian at states `x` and controls `u`.
+
+Returns a `RobotDynamics.DynamicsJacobian`. The `A` and `B` matrices can be extracted using any of the following methods:
+
+    ∇f.A                            # returns a view
+    ∇f.B                            # returns a view
+    RobotDynamics.get_A(∇f)         # returns a matrix
+    RobotDynamics.get_B(∇f)         # returns a matrix
+    RobotDynamics.get_static_A(∇f)  # returns an SMatrix
+    RobotDynamics.get_static_B(∇f)  # returns an SMatrix
+"""
 function jacobian(model::UnitreeA1, x, u)
     z = StaticKnotPoint(SVector{28}(x),SVector{12}(u),0.1,0.0)
     ∇f = RobotDynamics.DynamicsJacobian(model)
@@ -244,6 +258,21 @@ function jacobian(model::UnitreeA1, x, u)
     return ∇f
 end
 
+"""
+    discrete_jacobian(Q, model, x, u, dt)
+
+Evaluate the discrete dynamics Jacobian at states `x` and controls `u` with time step `dt`, using integration `Q`, which can be
+any of the integrators defined in RobotDynamics, e.g. (`RK4`, `RK3`, `RK2`).
+
+Returns a `RobotDynamics.DynamicsJacobian`. The `A` and `B` matrices can be extracted using any of the following methods:
+
+    ∇f.A                            # returns a view
+    ∇f.B                            # returns a view
+    RobotDynamics.get_A(∇f)         # returns a matrix
+    RobotDynamics.get_B(∇f)         # returns a matrix
+    RobotDynamics.get_static_A(∇f)  # returns an SMatrix
+    RobotDynamics.get_static_B(∇f)  # returns an SMatrix
+"""
 function discrete_jacobian(::Type{Q}, model::UnitreeA1, x, u, dt) where Q <: QuadratureRule 
     z = StaticKnotPoint(SVector{28}(x),SVector{12}(u),dt,0.0)
     ∇f = RobotDynamics.DynamicsJacobian(model)
