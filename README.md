@@ -20,7 +20,8 @@ Each notebook now includes a `run_tests()` function at the end, that will run th
 ## Submitting your homework
 Make sure your repo lives under the Class Organization. This will be done automatically when you use the GitHub Classrooms link we send provide.
 
-Follow [these instructions](https://github.com/Optimal-Control-16-745/JuliaIntro/blob/main/docs/Submission%20Instructions.md) for submitting your final time-stamped submission.
+1. Add your info to the `studentinfo` function in [src/hw2.jl](https://github.com/Optimal-Control-16-745/hw2/blob/main/src/hw2.jl)
+2. Create a release. Follow [these instructions](https://github.com/Optimal-Control-16-745/hw2/blob/main/src/hw2.jl#L6) for more info on creating the release.
 
 ## Adding the Upstream Repo
 We may release changes to the homework periodically if errors or bugs are found. Follow these instructions for linking your repo to the original template and pulling changes. It's always a good idea to branch your code before pulling from the upstream repo in case something goes wrong or the merge is particularly nasty. Do the right away after creating your repo. 
