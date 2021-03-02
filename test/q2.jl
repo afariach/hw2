@@ -9,8 +9,8 @@ data = load(joinpath(@__DIR__,"q2.jld2"))
 @test length(ctrl.K) == 100
 @test norm(ctrl.K[1] - ctrl.K[end]) > 1
 @test norm(ctrl.P[1] - ctrl.P[end]) > 1
-@test ctrl.K[1] ≈ data["K1"] rtol=1e-3
-@test ctrl.P[1] ≈ data["P1"] rtol=1e-3
+@test ctrl.K[1] ≈ data["K1"] atol=1e-3
+@test ctrl.P[1] ≈ data["P1"] atol=1e-3
 
 for k = 1:length(Xref)-1
     @test norm(get_control(ctrl, Xref[k], tref[k]) - Uref[k]) ≈ 0

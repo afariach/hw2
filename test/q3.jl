@@ -8,26 +8,26 @@ using BlockArrays
 @testset "Part a" begin
 # Part a
 xdiff = diff(Xref)[1:end-1]
-@test mean(xdiff)[1] ≈ 200 / (N-1) rtol = 1e-6
-@test mean(xdiff)[2] ≈ -500 / (N-1) rtol = 1e-6
-@test mean(xdiff)[3:end] ≈ zeros(6) rtol = 1e-6
+@test mean(xdiff)[1] ≈ 200 / (N-1) atol = 1e-6
+@test mean(xdiff)[2] ≈ -500 / (N-1) atol = 1e-6
+@test mean(xdiff)[3:end] ≈ zeros(6) atol = 1e-6
 
 Xref2 = nominal_trajectory([100,200,0, 0,0,0, 12.2, 0.], 101, 0.15)
 xmean = mean(Xref2[1:end-1])
-@test xmean[4] ≈ -100 / 100 / .15 rtol = 1e-6
-@test xmean[5] ≈ -200 / 100 / .15 rtol = 1e-6
+@test xmean[4] ≈ -100 / 100 / .15 atol = 1e-6
+@test xmean[5] ≈ -200 / 100 / .15 atol = 1e-6
 @test xmean[6] ≈ 0 
-@test xmean[7] ≈ 12.2 
+@test xmean[7] ≈ 12.2 atol = 1e-6
 @test xmean[8] ≈ 0 
 end
 
 @testset "Part b" begin
 # Part b
-@test ctrl.K ≈ dlqr(A,B,Q,R) rtol = 1e-3
-@test Qf ≈ dare(A,B,Q,R) rtol = 1e-3
+@test ctrl.K ≈ dlqr(A,B,Q,R) atol = 1e-3
+@test Qf ≈ dare(A,B,Q,R) atol = 1e-3
 xtest = xeq + randn(8)
 for k = 1:N-1
-    @test get_control(ctrl, Xref[k], tref[k]) ≈ zeros(2)
+    @test get_control(ctrl, Xref[k], tref[k]) ≈ zeros(2) atol=1e-10
 end
 @test !(get_control(ctrl, xtest, tref[1]) ≈ get_control(ctrl, xtest, tref[end]))
 @test get_control(ctrl, Xref[10] + xtest, tref[10]) ≈ 
@@ -50,7 +50,7 @@ parts1 = fill(n,50)
 parts2 = repeat([m,n],50)
 D = PseudoBlockArray(mpc1.A, parts1, parts2)
 @test D[Block(1,1)] ≈ B
-@test D[Block(2,1)] ≈ zero(B)
+@test D[Block(2,1)] ≈ zero(B) atol=1e-10
 @test D[Block(2,2)] ≈ A
 @test D[Block(2,4)] ≈ -I(n) 
 @test D[Block(3,4)] ≈ A
@@ -63,9 +63,9 @@ H = PseudoBlockArray(mpc1.P, parts2, parts2)
 @test H[Block(100,100)] ≈ Qf
 get_control(mpc1, Xref[1], tref[1])
 g = PseudoBlockArray(mpc1.q, parts2)
-@test g[Block(1)] ≈ zeros(2)
+@test g[Block(1)] ≈ zeros(2) atol=1e-10
 @test g[Block(2)] ≈ -Q*(Xref[2] - xeq)
-@test g[Block(3)] ≈ zeros(2)
+@test g[Block(3)] ≈ zeros(2) atol=1e-10
 @test g[Block(4)] ≈ -Q*(Xref[3] - xeq)
 @test g[Block(100)] ≈ -Qf*(Xref[51] - xeq)
 
@@ -76,7 +76,7 @@ get_control(mpc1, Xref[1], tref[10])
 get_control(mpc1, Xref[1], tref[end-10])
 @test g[Block(2)] ≈ -Q*(Xref[242] - xeq)
 @test g[Block(2*9)] ≈ -Q*(Xref[250] - xeq)
-@test g[Block(2*11)] ≈ zeros(8)
+@test g[Block(2*11)] ≈ zeros(8) atol=1e-10
 @test mpc1.lb[1:n] ≈ -A*(Xref[1] - xeq)
 
 @test norm(Xmpc1[end][4:6]) < 1e-2 
