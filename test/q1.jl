@@ -12,8 +12,8 @@ P1 = data["P1"]
 @test length(K) == 200
 @test size(K[1]) == (12,28)
 @test size(P[1]) == (28,28)
-@test K[1] ≈ K1 atol = 1e-4
-@test P[1] ≈ P1 atol = 1e-4
+@test K[1] ≈ K1 rtol = 1e-3
+@test P[1] ≈ P1 rtol = 1e-3
 @test norm(K[1],Inf) >  norm(K[end],Inf)
 end
 
@@ -29,7 +29,7 @@ end
 @testset "Part c" begin
 # Part c
 @test length(Kinf) >= 2*length(K)
-@test Kinf[1] ≈ data["Kinf"] atol = 1e-3
+@test Kinf[1] ≈ data["Kinf"] rtol = 1e-3
 @test norm(Kinf[1] - Kinf[2]) < 1e-2
 @test norm(Pinf[1] - Pinf[2]) < 1e2
 @test norm(get_control(ctrl, xeq, 0.0) - ueq) ≈ 0
