@@ -28,61 +28,6 @@ const STATEMAP = (
     RR_calf_joint = (14,4),
     RL_calf_joint = (15,15)
 )
-# function state2mech(x)
-#     SA[
-#         x[STATEMAP[:foot_joint_x][1]],
-#         x[STATEMAP[:foot_joint_y][1]],
-#         x[STATEMAP[:foot_joint_y][1]],
-#         x[STATEMAP[:RR_calf_joint][1]],
-#         x[STATEMAP[:RR_thigh_joint][1]],
-#         x[STATEMAP[:RR_hip_joint][1]],
-#         x[STATEMAP[:FR_hip_joint][1]],
-#         x[STATEMAP[:FL_hip_joint][1]],
-#         x[STATEMAP[:RL_hip_joint][1]],
-#         x[STATEMAP[:FR_thigh_joint][1]],
-#         x[STATEMAP[:FL_thigh_joint][1]],
-#         x[STATEMAP[:RL_thigh_joint][1]],
-#         x[STATEMAP[:FR_calf_joint][1]],
-#         x[STATEMAP[:FL_calf_joint][1]],
-#         x[STATEMAP[:RL_calf_joint][1]],
-#     ]
-# end
-
-
-# function mech2state(q)
-#     SA[
-#         q[STATEMAP[:foot_joint_x][2]],
-#         q[STATEMAP[:foot_joint_y][2]],
-#         q[STATEMAP[:foot_joint_z][2]],
-#         q[STATEMAP[:FR_hip_joint][2]],
-#         q[STATEMAP[:FL_hip_joint][2]],
-#         q[STATEMAP[:RR_hip_joint][2]],
-#         q[STATEMAP[:RL_hip_joint][2]],
-#         q[STATEMAP[:FR_thigh_joint][2]],
-#         q[STATEMAP[:FL_thigh_joint][2]],
-#         q[STATEMAP[:RR_thigh_joint][2]],
-#         q[STATEMAP[:RL_thigh_joint][2]],
-#         q[STATEMAP[:FR_calf_joint][2]],
-#         q[STATEMAP[:FL_calf_joint][2]],
-#         q[STATEMAP[:RR_calf_joint][2]],
-#         q[STATEMAP[:RL_calf_joint][2]],
-#     ]
-# end
-
-# function controls2torques(u)
-#     τ = [SA[0,0,0]; u]
-#     state2mech(τ)
-# end
-
-# function torques2controls(τ)
-#     u = mech2state(τ) 
-#     return u[SVector{12}(4:15)]
-# end
-
-# function mechstate2fullstate(state::MechanismState)
-#     return [mech2state(configuration(state)); mech2state(velocity(state))]
-# end
-
 """
     attach_foot!(mech, [foot; revolute])
 
@@ -165,18 +110,6 @@ function attach_foot!(mech::Mechanism{T}, foot="RR"; revolute::Bool=true) where 
             joint_pose = dummy_to_dummy 
         )
 
-        # # Z-Joint
-        # joint_to_foot = Transform3D(
-        #     frame_before(foot_joint_z),
-        #     default_frame(dummy2),
-        #     SA[0,0,0]
-        # )
-        # attach!(mech,
-        #     dummy2,
-        #     foot,
-        #     foot_joint_z,
-        #     joint_pose = joint_to_foot
-        # )
         remove_joint!(mech, findjoint(mech, "base_to_world"))
     end
 end
@@ -189,7 +122,6 @@ Read the A1 urdf and attach the foot to the floor. Returns a `Mechanism` type.
 function build_quadruped()
     a1 = parse_urdf(URDFPATH, floating=true, remove_fixed_tree_joints=false) 
     attach_foot!(a1)
-    # build_rear_foot_constraints_revolute!(a1)
     return a1
 end
 
@@ -237,20 +169,6 @@ function RobotDynamics.dynamics(model::UnitreeA1, x::AbstractVector{T1}, u::Abst
     return [q̇; v̇]
 end
 
-"""
-    jacobian(model, x, u)
-
-Evaluate the discrete continuous Jacobian at states `x` and controls `u`.
-
-Returns a `RobotDynamics.DynamicsJacobian`. The `A` and `B` matrices can be extracted using any of the following methods:
-
-    ∇f.A                            # returns a view
-    ∇f.B                            # returns a view
-    RobotDynamics.get_A(∇f)         # returns a matrix
-    RobotDynamics.get_B(∇f)         # returns a matrix
-    RobotDynamics.get_static_A(∇f)  # returns an SMatrix
-    RobotDynamics.get_static_B(∇f)  # returns an SMatrix
-"""
 function jacobian(model::UnitreeA1, x, u)
     z = StaticKnotPoint(SVector{28}(x),SVector{12}(u),0.1,0.0)
     ∇f = RobotDynamics.DynamicsJacobian(model)
@@ -258,21 +176,6 @@ function jacobian(model::UnitreeA1, x, u)
     return ∇f
 end
 
-"""
-    discrete_jacobian(Q, model, x, u, dt)
-
-Evaluate the discrete dynamics Jacobian at states `x` and controls `u` with time step `dt`, using integration `Q`, which can be
-any of the integrators defined in RobotDynamics, e.g. (`RK4`, `RK3`, `RK2`).
-
-Returns a `RobotDynamics.DynamicsJacobian`. The `A` and `B` matrices can be extracted using any of the following methods:
-
-    ∇f.A                            # returns a view
-    ∇f.B                            # returns a view
-    RobotDynamics.get_A(∇f)         # returns a matrix
-    RobotDynamics.get_B(∇f)         # returns a matrix
-    RobotDynamics.get_static_A(∇f)  # returns an SMatrix
-    RobotDynamics.get_static_B(∇f)  # returns an SMatrix
-"""
 function discrete_jacobian(::Type{Q}, model::UnitreeA1, x, u, dt) where Q <: QuadratureRule 
     z = StaticKnotPoint(SVector{28}(x),SVector{12}(u),dt,0.0)
     ∇f = RobotDynamics.DynamicsJacobian(model)
@@ -298,7 +201,6 @@ function initial_state(model::UnitreeA1)
         set_configuration!(state, findjoint(a1, leg[i] * "_thigh_joint"), deg2rad(-30f))
         set_configuration!(state, findjoint(a1, leg[i] * "_calf_joint"), deg2rad(10f))
     end
-    # set_configuration!(state, findjoint(a1, "foot_joint_x"), deg2rad(00))
     set_configuration!(state, findjoint(a1, "foot_joint_y"), deg2rad(30))
 
     return [configuration(state); velocity(state)]
@@ -431,17 +333,4 @@ function newton_solve(model::UnitreeA1, x_guess, mvis=nothing; verbose=true, max
         end
     end
     return x,u,λ, res_hist
-end
-# times = range(0,1, step=0.01)
-# X = [zero(x) for t in times]
-# X[1] .= x
-# for i = 1:length(times)-1
-#     X[i+1] = rk4(model, X[i], u, times[i+1]-times[i])
-# end
-# qs = [state2mech(x[1:15]) for x in X]
-# animate(mvis, Vector(times), Vector.(qs))
-
-
-function run_tests()
-    include(joinpath(@__DIR__,"..","test","q1.jl"))
 end
